@@ -1,0 +1,102 @@
+<!-- app/views/games/index.html.erb -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ゲームページ</title>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+</head>
+<body>
+  <% if @user_token == @valid_token %>
+    <div id="message">ゲームをプレイしてください。</div>
+    <div id="gameArea" style="display:block;">
+      <canvas id="gameCanvas"></canvas>
+      <div id="score">Score: 0</div>
+    </div>
+  <% else %>
+    <div>無効なトークンです。ゲームを開始できません。</div>
+  <% end %>
+
+  <%= javascript_include_tag 'game' %>
+</body>
+</html>
+/* app/assets/stylesheets/application.css */
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f0f0f0;
+  text-align: center;
+}
+
+#message {
+  font-size: 20px;
+  color: #ff0000;
+}
+
+#gameArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#gameCanvas {
+  background-color: #87ceeb;
+  border: 2px solid #000;
+}
+
+#score {
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 600px) {
+  #gameCanvas {
+    width: 90vw;  /* 画面幅に合わせて調整 */
+    height: 60vh; /* 画面高さに合わせて調整 */
+  }
+}
+// app/assets/javascripts/game.js
+
+document.addEventListener("DOMContentLoaded", function() {
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let score = 0;
+
+  const player = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    size: 30,
+    color: "red",
+    speed: 5,
+  };
+
+  const treasures = [];
+  const treasureSize = 40;
+
+  function createTreasure() {
+    const x = Math.random() * (canvas.width - treasureSize);
+    const y = Math.random() * (canvas.height - treasureSize);
+    const isWinning = Math.random() > 0.5;
+    treasures.push({ x, y, isWinning });
+  }
+
+  function drawPlayer() {
+    ctx.fillStyle = player.color;
+    ctx.fillRect(player.x, player.y, player.size, player.size);
+  }
+
+  function drawTreasures() {
+    treasures.forEach((treasure) => {
+      ctx.fillStyle = treasure.isWinning ? "gold" : "gray";
+      ctx.fillRect(treasure.x, treasure.y, tr...
